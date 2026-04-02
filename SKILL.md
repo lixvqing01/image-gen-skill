@@ -1,0 +1,130 @@
+---
+name: generate-image
+description: "Generate or edit high-fidelity raster images by calling a Yunwu-compatible image model, with explicit task-type and aspect-ratio inputs. Use when Codex needs to: (1) create ordinary product or visual assets, (2) draw project architecture or system diagrams, or (3) generate multiple PPT slide images in one visual language. Supports prompt-driven generation plus editing/compositing from up to 3 input images, and parallel PPT batch generation into a dedicated output subfolder."
+---
+
+# Generate Image
+
+Use the bundled scripts instead of writing one-off API clients.
+
+## Non-Negotiable Execution Rules
+- Always use the bundled scripts inside this skill folder.
+- Do not search the current project for similar image-generation or slide-generation scripts before using this skill.
+- Do not inspect local project `scripts/`, `tools/`, or `utils/` folders unless the user explicitly asks to modify or compare the project's own implementation.
+- Resolve script paths relative to this `SKILL.md` file and use `scripts/generate_image.py` or `scripts/generate_slide_series.py`.
+- For one image, call the bundled skill script directly.
+- For a deck or multi-slide batch, prefer the bundled `generate_slide_series.py` script instead of repeated manual orchestration.
+
+## Bundled Script Root
+- `scripts/generate_image.py`
+- `scripts/generate_slide_series.py`
+
+## Core Workflow
+1. Pick a task type:
+   - `normal` for ordinary image generation, UI visuals, product graphics, and generic design assets.
+   - `architecture` for project structure, system diagrams, data flow, and platform maps.
+   - `ppt` for presentation slide images.
+2. Pick an aspect ratio such as `1:1`, `4:3`, `16:9`, or `9:16`.
+3. Pick an output format: `png` by default, or `jpg` when smaller files are preferred.
+4. If editing or compositing, provide up to 3 `--image-path` inputs.
+5. Call `scripts/generate_image.py` with:
+   - `--prompt`
+   - `--task-type`
+   - `--aspect-ratio`
+   - `--output-format`
+   - `--image-name`
+   - optional repeated `--image-path` up to 3 files
+6. Reuse `--series-key` when generating multiple related images so the script keeps palette, typography, and layout language consistent across calls.
+7. For PPT slide series, the script auto-prefixes the saved image names with `01_`, `02_`, `03_` and so on. Use `--slide-number` only when you need to force a specific sequence number.
+8. When the user already knows the slide list, skip repeated single-slide calls and use `generate_slide_series.py`.
+9. For multi-slide PPT work, outputs go into a dedicated subfolder under `codex_image_gen/`, typically named after the series key.
+
+## Required Parameters
+- `--prompt`: natural-language generation or edit request.
+- `--task-type`: `normal`, `architecture`, or `ppt`.
+- `--aspect-ratio`: the intended output ratio.
+- `--output-format`: `png` by default, or `jpg`.
+- `--image-name`: lowercase, underscore-separated, at most 3 words. Example: `login_page_mockup`.
+- `--image-path`: optional existing images for edit/composite workflows. Pass at most 3.
+
+## Output Rules
+- Save final artifacts under a `codex_image_gen/` folder at the detected project root.
+- If no repo root is found, fall back to the current working directory.
+- Save image outputs plus prompt/metadata sidecars so later iterations remain traceable.
+- Save series manifests under `codex_image_gen/series/`.
+- For PPT series, save generated slide images into a child folder such as `codex_image_gen/investor_deck/`.
+
+## Authentication and Runtime
+- Default API endpoint: `https://yunwu.ai/v1/chat/completions`
+- Default model: `gemini-3.1-flash-image-preview`
+- Replace the placeholder `YOUR_YUNWU_API_KEY` in `scripts/_common.py`, or set `YUNWU_API_KEY`, or pass `--api-key ...` explicitly.
+- `OPENAI_API_KEY` is also accepted as a fallback env var for compatibility.
+
+## Design Rules
+- Aim for immediate visual impact. Favor bold but controlled color systems, premium contrast, and clear hierarchy.
+- Avoid generic pure red, pure blue, or pure green palettes when a richer palette will work better.
+- Prefer modern typography such as Inter, Roboto, or Outfit over browser-default styling.
+- Avoid placeholder content. If a mockup or slide needs imagery, generate it.
+- Use gradients, depth, and subtle motion cues when they improve the result.
+- Do not include laptop, phone, tablet, or browser chrome around UI screens unless the user explicitly asks for a device/mockup frame.
+
+## Task-Type Guidance
+### Normal
+- Use for ordinary image generation, UI concepts, posters, marketing visuals, and product graphics.
+- If the request is for a UI, keep the output interface-only and avoid device frames unless explicitly requested.
+- Adapt composition to the specified aspect ratio instead of assuming a fixed canvas.
+
+### Architecture
+- Use for project architecture, platform diagrams, service topology, component flows, and process maps.
+- Ask for a follow-up edit if exact text labels must be perfect; image models can drift on small text.
+- Prefer grouped subsystems, directional arrows, and clearly separated layers.
+
+### PPT
+- Default to `16:9` unless the user specifies another ratio.
+- Reuse a `--series-key` for multi-slide work.
+- For many slides, use `generate_slide_series.py` so slide generation runs in parallel.
+- Save slide images into a series-specific child folder and keep numbering explicit.
+
+## Commands
+```powershell
+python <skill_dir>\scripts\generate_image.py `
+  --task-type normal `
+  --aspect-ratio 16:9 `
+  --output-format png `
+  --prompt "Design a cinematic SaaS analytics dashboard for carbon trading." `
+  --image-name analytics_dashboard
+```
+
+```powershell
+python <skill_dir>\scripts\generate_image.py `
+  --task-type architecture `
+  --aspect-ratio 16:9 `
+  --output-format png `
+  --prompt "Draw a cloud-native RAG system with ingestion, vector store, orchestration, and observability." `
+  --image-name rag_architecture `
+  --series-key investor_deck
+```
+
+```powershell
+python <skill_dir>\scripts\generate_image.py `
+  --task-type ppt `
+  --aspect-ratio 16:9 `
+  --output-format png `
+  --prompt "Create an executive-summary slide for an AI platform launch with room for a title and three bullets." `
+  --image-name exec_summary `
+  --series-key investor_deck
+```
+
+```powershell
+python <skill_dir>\scripts\generate_slide_series.py `
+  --slides-file C:\path\to\slides.json
+```
+
+## References
+- Read `references/prompting.md` for prompt shaping and mode-specific guidance.
+- Read `references/slide-series.md` when you need explicit numbering and multi-slide workflow guidance.
+
+## Scripts
+- `scripts/generate_image.py`: generate or edit images and maintain style consistency across a series.
+- `scripts/generate_slide_series.py`: generate a whole PPT slide series from one JSON manifest, in parallel, into a dedicated output subfolder.
+- `scripts/_common.py`: shared path, naming, and series helpers.

@@ -65,9 +65,10 @@ Use the bundled scripts instead of writing one-off API clients.
 ## Design Rules
 - Aim for immediate visual impact. Favor bold but controlled color systems, premium contrast, and clear hierarchy.
 - Avoid generic pure red, pure blue, or pure green palettes when a richer palette will work better.
-- Prefer modern typography such as Inter, Roboto, or Outfit over browser-default styling.
+- Prefer modern typography cues. References like Inter, Roboto, or Outfit are guidance for the aesthetic, not text to render on canvas.
 - Avoid placeholder content. If a mockup or slide needs imagery, generate it.
-- Use gradients, depth, and subtle motion cues when they improve the result.
+- Use gradients, depth, glass-like layering, and subtle motion cues when they improve the result.
+- Treat palette notes, typography notes, and style directions as internal control signals rather than visible slide content.
 - Do not include laptop, phone, tablet, or browser chrome around UI screens unless the user explicitly asks for a device/mockup frame.
 
 ## Task-Type Guidance

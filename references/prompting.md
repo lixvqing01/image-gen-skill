@@ -15,9 +15,10 @@ Constraints: <keep/remove/avoid>
 ```
 
 ## Hard Rules
+- Aim for immediate visual impact with deliberate hierarchy and premium contrast.
 - Exclude device frames for UI unless explicitly requested.
 - Prefer curated HSL-like palettes over flat primary colors.
-- Use premium typography cues such as Inter, Roboto, or Outfit.
+- Use premium typography cues; references like Inter, Roboto, or Outfit are guidance, not text to render on canvas.
 - Do not accept placeholder lorem ipsum when the request implies real content.
 - Add smooth gradients, glass layers, or subtle motion cues only when they support the idea.
 - Treat palette notes, font cues, project names, and style directions as internal control signals rather than on-canvas content.
@@ -26,14 +27,14 @@ Constraints: <keep/remove/avoid>
 ## Task-Type Defaults
 ### Normal
 - Use interface-only compositions.
-- Favor clean hierarchy, glass panels, dense but readable information blocks, and premium shadows.
+- Favor tailored composition, dense but readable information blocks, premium shadows, and glass panels only when they improve the concept.
 
 ### Architecture
-- Favor layered blocks, clusters, connectors, and readable grouping.
+- Favor layered blocks, clusters, connectors, readable grouping, and short labels that survive image-model drift.
 - Ask for a cleanup pass if the diagram depends on exact small text.
 
 ### PPT
-- Favor 16:9 layouts, title-safe spacing, and a repeatable visual system.
+- Favor 16:9 layouts, title-safe spacing, a single focal narrative, and a repeatable visual system.
 - Preserve a visual lane for title/body overlays when a slide will be rebuilt into PPT.
 
 ## Series Consistency

@@ -21,35 +21,31 @@ TASK_TYPE_ALIAS = {
 
 STYLE_LIBRARY = {
     "normal": {
-        "visual_direction": "luminous glass product design",
-        "palette": ["#08111F", "#12324B", "#1A7F8E", "#63E6BE", "#F7FAFF"],
-        "font_family": "Outfit",
-        "color_story": "deep navy, ink blue, luminous teal, soft mint, and clean white",
+        "visual_direction": "high-end product visual language",
+        "typography_direction": "refined contemporary sans-serif typography",
         "prompt_suffix": (
-            "Create a premium production-ready image with a curated high-contrast palette, "
-            "refined gradients, polished depth, modern sans-serif typography cues "
+            "Create a premium production-ready image with immediate visual impact, "
+            "a sophisticated non-primary palette, polished gradients, refined depth, "
+            "tasteful glass-like layering when appropriate, contemporary typography cues "
             "when text is needed, and no placeholder content."
         ),
     },
     "architecture": {
-        "visual_direction": "cinematic systems diagram",
-        "palette": ["#07111E", "#0F3B53", "#21B8B2", "#FFC857", "#F8FBFF"],
-        "font_family": "Inter",
-        "color_story": "midnight blue, ocean teal, signal cyan, restrained gold, and crisp white",
+        "visual_direction": "editorial systems diagram",
+        "typography_direction": "precise contemporary sans-serif typography",
         "prompt_suffix": (
-            "Create a polished architecture diagram with grouped layers, directional connectors, "
-            "balanced spacing, crisp iconography, readable labels, subtle depth, and no device frame."
+            "Create a polished architecture visual with grouped layers, directional connectors, "
+            "curated accent colors, balanced spacing, crisp iconography, subtle depth, short readable labels, "
+            "and no device frame."
         ),
     },
     "ppt": {
-        "visual_direction": "editorial deck visual system",
-        "palette": ["#08111F", "#13233B", "#4EA8DE", "#63E6BE", "#F7FAFF"],
-        "font_family": "Outfit",
-        "color_story": "dark navy, slate blue, electric azure, bright teal, and soft white",
+        "visual_direction": "premium presentation visual system",
+        "typography_direction": "strong contemporary sans-serif typography",
         "prompt_suffix": (
-            "Create a presentation slide visual with a premium deck aesthetic, "
-            "clear title-safe spacing, cohesive gradients, modern sans-serif typography cues, "
-            "and strong visual hierarchy."
+            "Create a presentation slide visual with executive-level polish, "
+            "clear title-safe spacing, a deliberate focal narrative, sophisticated gradients or glass depth "
+            "when appropriate, contemporary typography cues, and strong visual hierarchy."
         ),
     },
 }

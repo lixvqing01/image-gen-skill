@@ -134,17 +134,20 @@ def resolve_api_url(api_format: str, api_url: str, model: str) -> str:
 def build_final_prompt(args: argparse.Namespace, style: dict) -> str:
     task_rules = {
         "normal": (
-            "Generate a polished general-purpose image or UI-style visual. "
+            "Generate a polished general-purpose image or UI-style visual with immediate visual impact. "
             "If the request is for a product interface, keep it interface-only and do not include device shells, "
-            "browser chrome, or surrounding hardware unless explicitly requested."
+            "browser chrome, or surrounding hardware unless explicitly requested. Favor bespoke composition, "
+            "realistic demo content, and premium hierarchy over generic template styling."
         ),
         "architecture": (
-            "Generate a clean project architecture or system map with grouped layers, readable labels, arrows, "
-            "clear data or control flow, and structured information design."
+            "Generate a clean project architecture or system map that reads clearly at a glance, with grouped layers, "
+            "short readable labels, arrows, clear data or control flow, and structured information design. "
+            "Use depth, contrast, and accent color to clarify structure rather than add decoration."
         ),
         "ppt": (
             "Generate a presentation-ready slide visual with strong hierarchy, title-safe spacing, "
-            "clear storytelling composition, and deck-quality polish."
+            "clear storytelling composition, and deck-quality polish. Design for a keynote-grade impression, "
+            "with one obvious focal idea and enough clean space for slide readability."
         ),
     }
     edit_clause = (
@@ -153,10 +156,10 @@ def build_final_prompt(args: argparse.Namespace, style: dict) -> str:
         else "No input image is provided; generate from scratch."
     )
     series_clause = (
-        f"Maintain consistency with series '{sanitize_series_key(args.series_key)}' using a shared visual language: "
-        f"{style['visual_direction']} with a {style.get('color_story', 'premium restrained palette')} color story."
+        f"Maintain consistency with series '{sanitize_series_key(args.series_key)}'. "
+        f"Shared visual direction: {style['visual_direction']}."
         if args.series_key
-        else f"Use a {style['visual_direction']} visual language with a {style.get('color_story', 'premium restrained palette')} color story."
+        else f"Visual Direction: {style['visual_direction']}."
     )
     return (
         f"Goal: {args.prompt}\n"
@@ -167,9 +170,10 @@ def build_final_prompt(args: argparse.Namespace, style: dict) -> str:
         f"Guidance: {task_rules[args.task_type]}\n"
         f"Edit Mode: {edit_clause}\n"
         "Ratio Guidance: Compose natively for the requested aspect ratio and avoid awkward cropping.\n"
-        "Constraints: make the result visually striking; use a curated palette instead of generic flat primary colors; "
-        "use modern sans-serif typography cues; avoid placeholders; use gradients, depth, and "
-        "subtle motion cues when helpful; do not place the UI inside a laptop, phone, or tablet frame unless the prompt explicitly asks for it.\n"
+        "Constraints: make the result visually striking at first glance; use a curated, harmonized palette instead of generic flat primary colors; "
+        "use contemporary sans-serif typography cues without rendering font names; avoid placeholders; prefer realistic demo content when the scene needs content; "
+        "use smooth gradients, restrained depth, subtle glass-like surfaces, and motion-implying detail only when they strengthen the composition; "
+        "do not place the UI inside a laptop, phone, or tablet frame unless the prompt explicitly asks for it.\n"
         "Render only the intended final artwork. Do not render style-guide sidebars, mood-board notes, color chips, palette circles, font specimen cards, "
         "hex color codes, project codenames, layout annotations, labels such as 'visual system' or 'font style', or the names of fonts unless the user explicitly asks for a style board.\n"
         f"Style Notes: {style['prompt_suffix']}"

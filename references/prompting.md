@@ -33,10 +33,12 @@ Constraints: <keep/remove/avoid>
 
 ### Architecture
 - Favor layered blocks, clusters, connectors, readable grouping, and short labels that survive image-model drift.
+- Favor framed modules, thin keylines, clipped insets, masked map or heatmap panels, and neat report-board composition.
 - Ask for a cleanup pass if the diagram depends on exact small text.
 
 ### PPT
 - Favor 16:9 layouts, title-safe spacing, a single focal narrative, and a repeatable visual system.
+- Favor bordered cards, masked content panels, side callout stacks, and figure-first board layouts similar to scientific delivery decks.
 - Preserve a visual lane for title/body overlays when a slide will be rebuilt into PPT.
 
 ## Series Consistency
@@ -69,8 +71,10 @@ Reference briefs:
 Use gradient-led briefs when the user wants spectacle, motion, launch visuals, futuristic product energy, or deck covers.
 Use minimal solid-color briefs when the user wants trust, restraint, enterprise clarity, editorial calm, or information-first layouts.
 Use journal/report briefs when the user wants publication credibility, scientific clarity, reviewer-friendly figures, or academic presentation visuals.
+Use framed board-layout briefs when the user wants figure-rich PPT pages, delivery-value summaries, workflow boards, or dashboard-like research overview slides.
 
 ## Editing with Input Images
 - Pass at most 3 `--image-path` files.
 - State what must remain unchanged.
 - State exactly what should be added, removed, or transformed.
+- When the project already contains useful rasters, maps, charts, or screenshots, treat them as canonical assets and ask the model to embed them into bordered, masked panels instead of redrawing them.

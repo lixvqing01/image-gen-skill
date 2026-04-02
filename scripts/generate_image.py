@@ -142,18 +142,20 @@ def build_final_prompt(args: argparse.Namespace, style: dict) -> str:
         "architecture": (
             "Generate a clean project architecture or system map that reads clearly at a glance, with grouped layers, "
             "short readable labels, arrows, clear data or control flow, and structured information design. "
-            "Use depth, contrast, and accent color to clarify structure rather than add decoration, and default to an academic-report tone."
+            "Use depth, contrast, and accent color to clarify structure rather than add decoration, and default to an academic-report tone. "
+            "Favor framed modules, thin borders, masked insets, clipped maps or heatmaps, and aligned annotation blocks."
         ),
         "ppt": (
             "Generate a presentation-ready slide visual with strong hierarchy, title-safe spacing, "
             "clear storytelling composition, and deck-quality polish. Design for a keynote-grade impression, "
-            "with one obvious focal idea and enough clean space for slide readability, using a visual language suitable for scientific reports or high-end academic talks."
+            "with one obvious focal idea and enough clean space for slide readability, using a visual language suitable for scientific reports or high-end academic talks. "
+            "Favor clean board-like layouts with bordered cards, masked figure panels, side callout columns, and consistent gutters."
         ),
     }
     edit_clause = (
-        f"Use {len(args.image_path)} provided image(s) as edit/composite input. Preserve requested invariants."
+        f"Use {len(args.image_path)} provided image(s) as primary source asset(s). Preserve requested invariants and prefer compositing them into framed, masked panels instead of repainting them from scratch."
         if args.image_path
-        else "No input image is provided; generate from scratch."
+        else "No input image is provided; generate from scratch. If reusable project assets are later supplied, prefer composing them as canonical content blocks rather than redrawing them."
     )
     series_clause = (
         f"Maintain consistency with series '{sanitize_series_key(args.series_key)}'. "
@@ -175,6 +177,7 @@ def build_final_prompt(args: argparse.Namespace, style: dict) -> str:
         "and accessible accent colors used intentionally rather than everywhere; avoid rainbow scales, avoid red-green dependent coding, avoid colored text whenever possible; "
         "use contemporary sans-serif typography cues without rendering font names; avoid placeholders; prefer realistic demo content when the scene needs content; "
         "use smooth gradients, restrained depth, subtle glass-like surfaces, and motion-implying detail only when they strengthen the composition, and prefer solid or near-monochrome surfaces when clarity matters more than spectacle; "
+        "for ppt and architecture compositions, prefer thin keylines, rounded or rectangular masks, bordered cards, clipped visual panels, and orderly grid alignment; "
         "do not place the UI inside a laptop, phone, or tablet frame unless the prompt explicitly asks for it.\n"
         "Render only the intended final artwork. Do not render style-guide sidebars, mood-board notes, color chips, palette circles, font specimen cards, "
         "hex color codes, project codenames, layout annotations, labels such as 'visual system' or 'font style', or the names of fonts unless the user explicitly asks for a style board.\n"

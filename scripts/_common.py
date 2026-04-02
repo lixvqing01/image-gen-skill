@@ -38,7 +38,8 @@ STYLE_LIBRARY = {
         "prompt_suffix": (
             "Create a polished academic-report architecture visual with graphite hierarchy on a clean neutral base, "
             "color-blind-safe accent colors used sparingly, grouped layers, directional connectors, "
-            "balanced spacing, crisp iconography, short readable labels, minimal decoration, and no device frame."
+            "balanced spacing, crisp iconography, short readable labels, framed content modules, thin keylines, "
+            "masked figure panels, minimal decoration, and no device frame."
         ),
     },
     "ppt": {
@@ -47,8 +48,8 @@ STYLE_LIBRARY = {
         "prompt_suffix": (
             "Create a presentation slide visual with journal-grade clarity, "
             "clear title-safe spacing, one deliberate focal narrative, softened complementary accents, "
-            "a clean neutral base, subtle gradients only when they reinforce emphasis, "
-            "and strong visual hierarchy suitable for scientific reports or academic talks."
+            "a clean neutral base, framed cards, rounded masked panels for figures or maps, "
+            "subtle gradients only when they reinforce emphasis, and strong visual hierarchy suitable for scientific reports or academic talks."
         ),
     },
 }

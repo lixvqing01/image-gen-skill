@@ -11,6 +11,7 @@ Use the bundled scripts instead of writing one-off API clients.
 - Always use the bundled scripts inside this skill folder.
 - Do not search the current project for similar image-generation or slide-generation scripts before using this skill.
 - Do not inspect local project `scripts/`, `tools/`, or `utils/` folders unless the user explicitly asks to modify or compare the project's own implementation.
+- You may inspect project asset folders such as `assets/`, `figures/`, `images/`, `exports/`, `results/`, `docs/`, or `slides/` when looking for reusable charts, maps, screenshots, diagrams, or report figures to feed into this skill.
 - Resolve script paths relative to this `SKILL.md` file and use `scripts/generate_image.py` or `scripts/generate_slide_series.py`.
 - For one image, call the bundled skill script directly.
 - For a deck or multi-slide batch, prefer the bundled `generate_slide_series.py` script instead of repeated manual orchestration.
@@ -39,6 +40,7 @@ Use the bundled scripts instead of writing one-off API clients.
 8. When the user already knows the slide list, skip repeated single-slide calls and use `generate_slide_series.py`.
 9. For multi-slide PPT work, outputs go into a dedicated subfolder under `codex_image_gen/`, typically named after the series key.
 10. When the user cares about a specific visual taste, add a concise `--style-brief` instead of overloading the main prompt with styling clauses.
+11. For PPT and architecture work, actively look for reusable project visuals such as exported maps, charts, legends, screenshots, PDFs, and figure crops, then pass them as `--image-path` inputs when they should appear in the final composition.
 
 ## Required Parameters
 - `--prompt`: natural-language generation or edit request.
@@ -84,12 +86,16 @@ Use the bundled scripts instead of writing one-off API clients.
 - Use for project architecture, platform diagrams, service topology, component flows, and process maps.
 - Ask for a follow-up edit if exact text labels must be perfect; image models can drift on small text.
 - Prefer grouped subsystems, directional arrows, and clearly separated layers.
+- Prefer white or softly tinted report boards, thin borders, masked map or chart insets, and explicit framed modules.
+- If the project already has maps, rasters, legends, plots, or workflow sketches, reuse them as source assets instead of redrawing them.
 
 ### PPT
 - Default to `16:9` unless the user specifies another ratio.
 - Reuse a `--series-key` for multi-slide work.
 - For many slides, use `generate_slide_series.py` so slide generation runs in parallel.
 - Save slide images into a series-specific child folder and keep numbering explicit.
+- Favor board-like slide layouts with bordered cards, clipped panels, side callout stacks, and consistent gutters.
+- If project figures already exist, compose them into the slide as masked content blocks before inventing new imagery.
 
 ## Style-Brief Guidance
 - Use `--style-brief` when the user wants a specific taste, art direction, or brand mood.
@@ -103,6 +109,10 @@ Use the bundled scripts instead of writing one-off API clients.
   `cool white base, graphite labels, accessible blue-orange-green-magenta accents, publication-grade clarity`
 - Academic report minimal:
   `warm paper background, charcoal hierarchy, muted teal and ochre accents, restrained report layout`
+- Board-style research delivery:
+  `powder blue background, thin teal keylines, rounded white cards, masked figure panels, report board layout`
+- Framed scientific dashboard:
+  `soft blue-gray base, graphite titles, framed heatmap panels, side callout stack, clean delivery slide`
 - Scientific keynote cover:
   `deep academic navy, aurora blue-violet gradient, crisp white typography, premium research keynote mood`
 - Methods-figure monochrome:

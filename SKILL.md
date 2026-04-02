@@ -71,6 +71,8 @@ Use the bundled scripts instead of writing one-off API clients.
 - Use gradients, depth, glass-like layering, and subtle motion cues when they improve the result.
 - Treat palette notes, typography notes, and style directions as internal control signals rather than visible slide content.
 - Do not include laptop, phone, tablet, or browser chrome around UI screens unless the user explicitly asks for a device/mockup frame.
+- Default to a top-journal / academic-report baseline: clean neutral backgrounds, accessible accent colors, high text contrast, sparse color usage, and restrained decoration.
+- Avoid rainbow scales, avoid relying on red-green pairings to encode meaning, and avoid colored text when black/white labels with keylines will read better.
 
 ## Task-Type Guidance
 ### Normal
@@ -97,6 +99,16 @@ Use the bundled scripts instead of writing one-off API clients.
 - Prefer one dominant direction instead of mixing many incompatible aesthetics.
 
 ## Style-Brief Reference Patterns
+- Nature-style accessible figure:
+  `cool white base, graphite labels, accessible blue-orange-green-magenta accents, publication-grade clarity`
+- Academic report minimal:
+  `warm paper background, charcoal hierarchy, muted teal and ochre accents, restrained report layout`
+- Scientific keynote cover:
+  `deep academic navy, aurora blue-violet gradient, crisp white typography, premium research keynote mood`
+- Methods-figure monochrome:
+  `off-white canvas, black keylines, single cyan accent, monochrome scientific figure`
+- Cell-style graphical abstract:
+  `softened complementary palette, single focal process, sparse labels, clean biological storytelling`
 - Premium gradient tech:
   `deep charcoal base, electric cyan-to-violet gradients, luminous glass panels, cinematic contrast`
 - Premium gradient editorial:
@@ -119,6 +131,13 @@ Use the bundled scripts instead of writing one-off API clients.
   `graphite base, icy blue highlights, subtle glass depth, focused enterprise composition`
 - Avoid:
   long paragraph-style briefs, contradictory directions, or raw font names / hex codes unless the user explicitly wants a style board
+
+## Journal-Derived Default Baseline
+- Use a Nature / Cell / Elsevier-inspired baseline unless the user clearly wants a different visual language.
+- Start from neutral white, ivory, stone, graphite, or academic navy foundations.
+- Add only a few softened accent colors, ideally from an accessible figure palette.
+- Let layout, grouping, keylines, and contrast carry the information before color does.
+- Use stronger gradients and glow only for covers, keynote openers, or hero visuals; keep methods figures and report diagrams quieter.
 
 ## Commands
 ```powershell

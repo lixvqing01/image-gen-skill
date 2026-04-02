@@ -136,18 +136,18 @@ def build_final_prompt(args: argparse.Namespace, style: dict) -> str:
         "normal": (
             "Generate a polished general-purpose image or UI-style visual with immediate visual impact. "
             "If the request is for a product interface, keep it interface-only and do not include device shells, "
-            "browser chrome, or surrounding hardware unless explicitly requested. Favor bespoke composition, "
-            "realistic demo content, and premium hierarchy over generic template styling."
+            "browser chrome, or surrounding hardware unless explicitly requested. Favor publication-grade clarity, "
+            "realistic demo content, premium hierarchy, and softened scholarly color relationships over generic template styling."
         ),
         "architecture": (
             "Generate a clean project architecture or system map that reads clearly at a glance, with grouped layers, "
             "short readable labels, arrows, clear data or control flow, and structured information design. "
-            "Use depth, contrast, and accent color to clarify structure rather than add decoration."
+            "Use depth, contrast, and accent color to clarify structure rather than add decoration, and default to an academic-report tone."
         ),
         "ppt": (
             "Generate a presentation-ready slide visual with strong hierarchy, title-safe spacing, "
             "clear storytelling composition, and deck-quality polish. Design for a keynote-grade impression, "
-            "with one obvious focal idea and enough clean space for slide readability."
+            "with one obvious focal idea and enough clean space for slide readability, using a visual language suitable for scientific reports or high-end academic talks."
         ),
     }
     edit_clause = (
@@ -171,8 +171,10 @@ def build_final_prompt(args: argparse.Namespace, style: dict) -> str:
         f"Edit Mode: {edit_clause}\n"
         "Ratio Guidance: Compose natively for the requested aspect ratio and avoid awkward cropping.\n"
         "Constraints: make the result visually striking at first glance; use a curated, harmonized palette instead of generic flat primary colors; "
+        "default to a top-journal / academic-report aesthetic with a clean neutral base, high-contrast black or white text, "
+        "and accessible accent colors used intentionally rather than everywhere; avoid rainbow scales, avoid red-green dependent coding, avoid colored text whenever possible; "
         "use contemporary sans-serif typography cues without rendering font names; avoid placeholders; prefer realistic demo content when the scene needs content; "
-        "use smooth gradients, restrained depth, subtle glass-like surfaces, and motion-implying detail only when they strengthen the composition; "
+        "use smooth gradients, restrained depth, subtle glass-like surfaces, and motion-implying detail only when they strengthen the composition, and prefer solid or near-monochrome surfaces when clarity matters more than spectacle; "
         "do not place the UI inside a laptop, phone, or tablet frame unless the prompt explicitly asks for it.\n"
         "Render only the intended final artwork. Do not render style-guide sidebars, mood-board notes, color chips, palette circles, font specimen cards, "
         "hex color codes, project codenames, layout annotations, labels such as 'visual system' or 'font style', or the names of fonts unless the user explicitly asks for a style board.\n"

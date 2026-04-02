@@ -23,6 +23,8 @@ Constraints: <keep/remove/avoid>
 - Add smooth gradients, glass layers, or subtle motion cues only when they support the idea.
 - Treat palette notes, font cues, project names, and style directions as internal control signals rather than on-canvas content.
 - Unless the user explicitly asks for a style board, do not render color chips, palette swatches, font names, hex codes, layout notes, or labels like `Visual system` / `Font style`.
+- Default to a publication-grade aesthetic: clean neutral bases, high-contrast labels, accessible accent colors, and restrained decoration.
+- Avoid rainbow scales, avoid red-green dependent coding, and avoid colored text when keylines plus black or white labels will read more clearly.
 
 ## Task-Type Defaults
 ### Normal
@@ -52,6 +54,11 @@ When the user needs multiple related slides or visuals:
 - Prefer one coherent family over mixed signals.
 
 Reference briefs:
+- `cool white base, graphite labels, accessible blue-orange-green-magenta accents, publication-grade clarity`
+- `warm paper background, charcoal hierarchy, muted teal and ochre accents, restrained report layout`
+- `deep academic navy, aurora blue-violet gradient, crisp white typography, premium research keynote mood`
+- `off-white canvas, black keylines, single cyan accent, monochrome scientific figure`
+- `softened complementary palette, single focal process, sparse labels, clean biological storytelling`
 - `deep charcoal base, electric cyan-to-violet gradients, luminous glass panels, cinematic contrast`
 - `midnight navy backdrop, aurora gradients, soft bloom lighting, refined editorial spacing`
 - `warm ivory background, graphite text, muted bronze accents, flat premium surfaces`
@@ -61,6 +68,7 @@ Reference briefs:
 
 Use gradient-led briefs when the user wants spectacle, motion, launch visuals, futuristic product energy, or deck covers.
 Use minimal solid-color briefs when the user wants trust, restraint, enterprise clarity, editorial calm, or information-first layouts.
+Use journal/report briefs when the user wants publication credibility, scientific clarity, reviewer-friendly figures, or academic presentation visuals.
 
 ## Editing with Input Images
 - Pass at most 3 `--image-path` files.

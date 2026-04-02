@@ -21,31 +21,34 @@ TASK_TYPE_ALIAS = {
 
 STYLE_LIBRARY = {
     "normal": {
-        "visual_direction": "high-end product visual language",
-        "typography_direction": "refined contemporary sans-serif typography",
+        "visual_direction": "scholarly editorial visual language",
+        "typography_direction": "clean publication-grade sans-serif typography",
         "prompt_suffix": (
-            "Create a premium production-ready image with immediate visual impact, "
-            "a sophisticated non-primary palette, polished gradients, refined depth, "
-            "tasteful glass-like layering when appropriate, contemporary typography cues "
-            "when text is needed, and no placeholder content."
+            "Create a publication-grade visual with a clean light or softly tinted base, "
+            "high-contrast labeling, a color-blind-aware accent palette inspired by top-journal figure practice "
+            "(blue, sky blue, bluish green, orange, vermillion, and reddish purple), "
+            "softened complementary colors instead of heavily saturated primaries, "
+            "restrained premium finish, subtle gradients only when they improve focus, "
+            "and no placeholder content."
         ),
     },
     "architecture": {
-        "visual_direction": "editorial systems diagram",
-        "typography_direction": "precise contemporary sans-serif typography",
+        "visual_direction": "research report systems diagram",
+        "typography_direction": "precise publication-grade sans-serif typography",
         "prompt_suffix": (
-            "Create a polished architecture visual with grouped layers, directional connectors, "
-            "curated accent colors, balanced spacing, crisp iconography, subtle depth, short readable labels, "
-            "and no device frame."
+            "Create a polished academic-report architecture visual with graphite hierarchy on a clean neutral base, "
+            "color-blind-safe accent colors used sparingly, grouped layers, directional connectors, "
+            "balanced spacing, crisp iconography, short readable labels, minimal decoration, and no device frame."
         ),
     },
     "ppt": {
-        "visual_direction": "premium presentation visual system",
-        "typography_direction": "strong contemporary sans-serif typography",
+        "visual_direction": "academic keynote visual system",
+        "typography_direction": "strong publication-grade sans-serif typography",
         "prompt_suffix": (
-            "Create a presentation slide visual with executive-level polish, "
-            "clear title-safe spacing, a deliberate focal narrative, sophisticated gradients or glass depth "
-            "when appropriate, contemporary typography cues, and strong visual hierarchy."
+            "Create a presentation slide visual with journal-grade clarity, "
+            "clear title-safe spacing, one deliberate focal narrative, softened complementary accents, "
+            "a clean neutral base, subtle gradients only when they reinforce emphasis, "
+            "and strong visual hierarchy suitable for scientific reports or academic talks."
         ),
     },
 }

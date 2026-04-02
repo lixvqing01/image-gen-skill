@@ -44,6 +44,24 @@ When the user needs multiple related slides or visuals:
 3. Add `--style-brief` only on the first call unless a deliberate style shift is required.
 4. Reuse the same series manifest for all later calls.
 
+## Writing `style_brief`
+- Use `style_brief` to steer taste, not content.
+- Keep it compact and noun-heavy; avoid full-sentence prose.
+- Include up to four ingredients:
+  `base tone`, `accent family`, `surface treatment`, `layout mood`
+- Prefer one coherent family over mixed signals.
+
+Reference briefs:
+- `deep charcoal base, electric cyan-to-violet gradients, luminous glass panels, cinematic contrast`
+- `midnight navy backdrop, aurora gradients, soft bloom lighting, refined editorial spacing`
+- `warm ivory background, graphite text, muted bronze accents, flat premium surfaces`
+- `matte black canvas, stone gray structure, restrained emerald accents, minimal premium UI`
+- `cool white base, graphite hierarchy, surgical cyan highlights, restrained depth`
+- `cream background, espresso typography, bronze accents, luxury magazine layout`
+
+Use gradient-led briefs when the user wants spectacle, motion, launch visuals, futuristic product energy, or deck covers.
+Use minimal solid-color briefs when the user wants trust, restraint, enterprise clarity, editorial calm, or information-first layouts.
+
 ## Editing with Input Images
 - Pass at most 3 `--image-path` files.
 - State what must remain unchanged.

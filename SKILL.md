@@ -38,6 +38,7 @@ Use the bundled scripts instead of writing one-off API clients.
 7. For PPT slide series, the script auto-prefixes the saved image names with `01_`, `02_`, `03_` and so on. Use `--slide-number` only when you need to force a specific sequence number.
 8. When the user already knows the slide list, skip repeated single-slide calls and use `generate_slide_series.py`.
 9. For multi-slide PPT work, outputs go into a dedicated subfolder under `codex_image_gen/`, typically named after the series key.
+10. When the user cares about a specific visual taste, add a concise `--style-brief` instead of overloading the main prompt with styling clauses.
 
 ## Required Parameters
 - `--prompt`: natural-language generation or edit request.
@@ -87,6 +88,37 @@ Use the bundled scripts instead of writing one-off API clients.
 - Reuse a `--series-key` for multi-slide work.
 - For many slides, use `generate_slide_series.py` so slide generation runs in parallel.
 - Save slide images into a series-specific child folder and keep numbering explicit.
+
+## Style-Brief Guidance
+- Use `--style-brief` when the user wants a specific taste, art direction, or brand mood.
+- Keep it short and concrete: 5 to 12 words is usually enough.
+- Focus on palette mood, surface treatment, contrast level, composition feel, and typography character.
+- Treat it as an internal control phrase. Do not ask the model to render the style brief itself.
+- Prefer one dominant direction instead of mixing many incompatible aesthetics.
+
+## Style-Brief Reference Patterns
+- Premium gradient tech:
+  `deep charcoal base, electric cyan-to-violet gradients, luminous glass panels, cinematic contrast`
+- Premium gradient editorial:
+  `midnight navy backdrop, aurora gradients, soft bloom lighting, refined editorial spacing`
+- Minimal solid-color light:
+  `warm ivory background, graphite text, muted bronze accents, flat premium surfaces`
+- Minimal solid-color dark:
+  `matte black canvas, stone gray structure, restrained emerald accents, minimal premium UI`
+- Quiet enterprise architecture:
+  `cool white base, graphite hierarchy, surgical cyan highlights, restrained depth`
+- Luxury print-inspired dashboard:
+  `cream background, espresso typography, bronze accents, luxury magazine layout`
+
+## Style-Brief Writing Formula
+- Use this pattern when inventing a new one:
+  `<base tone>, <accent family>, <surface treatment>, <layout or mood>`
+- Good:
+  `soft sand background, slate typography, muted coral accents, calm editorial layout`
+- Good:
+  `graphite base, icy blue highlights, subtle glass depth, focused enterprise composition`
+- Avoid:
+  long paragraph-style briefs, contradictory directions, or raw font names / hex codes unless the user explicitly wants a style board
 
 ## Commands
 ```powershell

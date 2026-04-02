@@ -282,6 +282,73 @@ def save_outputs(root: Path, image_name: str, data_urls: list[str], output_forma
     return saved
 
 
+def compact_text(value: str, limit: int = 400) -> str:
+    collapsed = " ".join(value.split())
+    if len(collapsed) <= limit:
+        return collapsed
+    return f"{collapsed[: limit - 3]}..."
+
+
+def extract_error_message(response: requests.Response) -> str:
+    try:
+        payload = response.json()
+    except ValueError:
+        payload = None
+
+    if isinstance(payload, dict):
+        error = payload.get("error")
+        if isinstance(error, dict):
+            message = error.get("message")
+            status = error.get("status") or error.get("type")
+            code = error.get("code")
+            parts = [str(part) for part in [status, code, message] if part]
+            if parts:
+                return " | ".join(parts)
+        if isinstance(error, str) and error.strip():
+            return error.strip()
+        message = payload.get("message")
+        if isinstance(message, str) and message.strip():
+            return message.strip()
+
+    if response.text:
+        return compact_text(response.text)
+    return response.reason or "Unknown API error"
+
+
+def post_json(
+    url: str,
+    headers: dict[str, str],
+    payload: dict,
+    timeout: int,
+) -> dict:
+    try:
+        response = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+            timeout=timeout,
+        )
+    except requests.exceptions.Timeout:
+        raise RuntimeError(f"API request timed out after {timeout}s: {url}. The service may be slow or the network may be unstable.")
+    except requests.exceptions.ConnectionError:
+        raise RuntimeError(f"API connection failed: {url}. Check the network path, endpoint address, or proxy settings.")
+    except requests.exceptions.RequestException as exc:
+        raise RuntimeError(f"API request failed before a response was received: {compact_text(str(exc))}")
+
+    if response.status_code == 429:
+        raise RuntimeError(f"API rate limit hit (429): {extract_error_message(response)}")
+    if response.status_code >= 500:
+        raise RuntimeError(f"API server error ({response.status_code}): {extract_error_message(response)}")
+    if response.status_code >= 400:
+        raise RuntimeError(f"API request rejected ({response.status_code}): {extract_error_message(response)}")
+
+    try:
+        return response.json()
+    except ValueError:
+        snippet = compact_text(response.text or "")
+        raise RuntimeError(f"API returned a non-JSON response from {url}: {snippet or 'empty response'}")
+
+
 def send_openai_request(args: argparse.Namespace, final_prompt: str, image_paths: list[Path], resolved_api_url: str) -> dict:
     payload = {
         "model": args.model,
@@ -292,17 +359,15 @@ def send_openai_request(args: argparse.Namespace, final_prompt: str, image_paths
             }
         ],
     }
-    response = requests.post(
+    return post_json(
         resolved_api_url,
-        headers={
+        {
             "Authorization": f"Bearer {args.api_key}",
             "Content-Type": "application/json",
         },
-        json=payload,
-        timeout=args.timeout,
+        payload,
+        args.timeout,
     )
-    response.raise_for_status()
-    return response.json()
 
 
 def send_gemini_request(args: argparse.Namespace, final_prompt: str, image_paths: list[Path], resolved_api_url: str) -> dict:
@@ -317,17 +382,15 @@ def send_gemini_request(args: argparse.Namespace, final_prompt: str, image_paths
             "responseModalities": ["TEXT", "IMAGE"],
         },
     }
-    response = requests.post(
+    return post_json(
         resolved_api_url,
-        headers={
+        {
             "x-goog-api-key": args.api_key,
             "Content-Type": "application/json",
         },
-        json=payload,
-        timeout=args.timeout,
+        payload,
+        args.timeout,
     )
-    response.raise_for_status()
-    return response.json()
 
 
 def main() -> int:
@@ -412,10 +475,14 @@ def main() -> int:
         print("Missing API key. Set IMAGE_GEN_API_KEY or pass --api-key.", file=sys.stderr)
         return 2
     resolved_api_url = resolve_api_url(args.api_format, args.api_url, args.model)
-    if args.api_format == "gemini":
-        result = send_gemini_request(args, final_prompt, image_paths, resolved_api_url)
-    else:
-        result = send_openai_request(args, final_prompt, image_paths, resolved_api_url)
+    try:
+        if args.api_format == "gemini":
+            result = send_gemini_request(args, final_prompt, image_paths, resolved_api_url)
+        else:
+            result = send_openai_request(args, final_prompt, image_paths, resolved_api_url)
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
 
     data_urls = extract_data_urls(result)
     if not data_urls:

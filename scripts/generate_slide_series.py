@@ -80,8 +80,21 @@ def build_command(
     return command
 
 
-def run_one(command: list[str]) -> None:
-    subprocess.run(command, check=True)
+def compact_text(value: str, limit: int = 400) -> str:
+    collapsed = " ".join(value.split())
+    if len(collapsed) <= limit:
+        return collapsed
+    return f"{collapsed[: limit - 3]}..."
+
+
+def command_label(command: list[str]) -> str:
+    if "--image-name" in command:
+        return command[command.index("--image-name") + 1]
+    return subprocess.list2cmdline(command)
+
+
+def run_one(command: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(command, capture_output=True, text=True)
 
 
 def main() -> int:
@@ -136,10 +149,22 @@ def main() -> int:
     series_record, _ = load_or_create_series(root, series_key, "ppt", style_brief)
 
     max_workers = max(1, min(args.max_workers, len(commands)))
+    failures: list[str] = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = [executor.submit(run_one, command) for command in commands]
+        futures = {executor.submit(run_one, command): command for command in commands}
         for future in as_completed(futures):
-            future.result()
+            command = futures[future]
+            result = future.result()
+            if result.returncode == 0:
+                continue
+            label = command_label(command)
+            detail = compact_text(result.stderr or result.stdout or "Unknown slide generation failure.")
+            print(f"Slide '{label}' failed: {detail}", file=sys.stderr)
+            failures.append(label)
+
+    if failures:
+        print(f"PPT batch failed for {len(failures)} slide(s).", file=sys.stderr)
+        return 1
 
     items = []
     for index, slide in enumerate(slides, start=1):

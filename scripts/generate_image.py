@@ -14,9 +14,11 @@ import requests
 from PIL import Image
 
 from _common import (
-    DEFAULT_API_URL,
     DEFAULT_API_KEY,
+    DEFAULT_API_FORMAT,
+    DEFAULT_GEMINI_API_BASE,
     DEFAULT_MODEL,
+    DEFAULT_OPENAI_API_URL,
     build_style,
     is_valid_aspect_ratio,
     load_or_create_series,
@@ -33,7 +35,7 @@ from _common import (
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Generate or edit images with a Yunwu-compatible image model.")
+    parser = argparse.ArgumentParser(description="Generate or edit images with either an OpenAI-compatible or Gemini official image API.")
     parser.add_argument("--prompt", required=True, help="Main text prompt.")
     parser.add_argument("--image-name", required=True, help="lowercase_underscore name, max 3 words.")
     parser.add_argument(
@@ -75,11 +77,33 @@ def parse_args() -> argparse.Namespace:
         "--output-subdir",
         help="Optional subfolder under codex_image_gen for grouping outputs. PPT series default to their own subfolder.",
     )
-    parser.add_argument("--api-url", default=os.getenv("YUNWU_API_URL", DEFAULT_API_URL))
-    parser.add_argument("--model", default=os.getenv("YUNWU_IMAGE_MODEL", DEFAULT_MODEL))
+    parser.add_argument(
+        "--api-format",
+        choices=["openai", "gemini"],
+        default=os.getenv("IMAGE_GEN_API_FORMAT", DEFAULT_API_FORMAT),
+        help="API protocol. Use openai for OpenAI-compatible chat completions, or gemini for Google's official generateContent API.",
+    )
+    parser.add_argument(
+        "--api-url",
+        default=os.getenv("IMAGE_GEN_API_URL", ""),
+        help="Full endpoint URL. If omitted, a default is chosen from --api-format.",
+    )
+    parser.add_argument("--model", default=os.getenv("IMAGE_GEN_MODEL", os.getenv("YUNWU_IMAGE_MODEL", DEFAULT_MODEL)))
     parser.add_argument(
         "--api-key",
-        default=os.getenv("YUNWU_API_KEY", os.getenv("OPENAI_API_KEY", DEFAULT_API_KEY)),
+        default=os.getenv(
+            "IMAGE_GEN_API_KEY",
+            os.getenv(
+                "GEMINI_API_KEY",
+                os.getenv(
+                    "GOOGLE_API_KEY",
+                    os.getenv(
+                        "YUNWU_API_KEY",
+                        os.getenv("OPENAI_API_KEY", DEFAULT_API_KEY),
+                    ),
+                ),
+            ),
+        ),
     )
     parser.add_argument("--output-root", help="Override the output folder. Defaults to ./codex_image_gen at project root.")
     parser.add_argument("--timeout", type=int, default=240, help="HTTP timeout in seconds.")
@@ -91,6 +115,20 @@ def image_data_url(path: Path) -> str:
     mime = mimetypes.guess_type(path.name)[0] or "image/png"
     payload = base64.b64encode(path.read_bytes()).decode("ascii")
     return f"data:{mime};base64,{payload}"
+
+
+def image_inline_data(path: Path) -> dict:
+    mime = mimetypes.guess_type(path.name)[0] or "image/png"
+    payload = base64.b64encode(path.read_bytes()).decode("ascii")
+    return {"inline_data": {"mime_type": mime, "data": payload}}
+
+
+def resolve_api_url(api_format: str, api_url: str, model: str) -> str:
+    if api_url.strip():
+        return api_url.strip()
+    if api_format == "gemini":
+        return f"{DEFAULT_GEMINI_API_BASE}/models/{model}:generateContent"
+    return DEFAULT_OPENAI_API_URL
 
 
 def build_final_prompt(args: argparse.Namespace, style: dict) -> str:
@@ -147,6 +185,13 @@ def build_request_content(prompt: str, image_paths: list[Path]) -> str | list[di
     return content
 
 
+def build_gemini_parts(prompt: str, image_paths: list[Path]) -> list[dict]:
+    parts = [{"text": prompt}]
+    for path in image_paths:
+        parts.append(image_inline_data(path))
+    return parts
+
+
 def extract_data_urls(value) -> list[str]:
     matches: list[str] = []
 
@@ -161,6 +206,18 @@ def extract_data_urls(value) -> list[str]:
                 walk(item)
             return
         if isinstance(node, dict):
+            if "inlineData" in node and isinstance(node["inlineData"], dict):
+                inline_data = node["inlineData"]
+                mime_type = inline_data.get("mimeType")
+                data = inline_data.get("data")
+                if mime_type and data:
+                    matches.append(f"data:{mime_type};base64,{data}")
+            if "inline_data" in node and isinstance(node["inline_data"], dict):
+                inline_data = node["inline_data"]
+                mime_type = inline_data.get("mime_type")
+                data = inline_data.get("data")
+                if mime_type and data:
+                    matches.append(f"data:{mime_type};base64,{data}")
             for child in node.values():
                 walk(child)
 
@@ -217,6 +274,54 @@ def save_outputs(root: Path, image_name: str, data_urls: list[str], output_forma
         path.write_bytes(converted_bytes)
         saved.append(path)
     return saved
+
+
+def send_openai_request(args: argparse.Namespace, final_prompt: str, image_paths: list[Path], resolved_api_url: str) -> dict:
+    payload = {
+        "model": args.model,
+        "messages": [
+            {
+                "role": "user",
+                "content": build_request_content(final_prompt, image_paths),
+            }
+        ],
+    }
+    response = requests.post(
+        resolved_api_url,
+        headers={
+            "Authorization": f"Bearer {args.api_key}",
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=args.timeout,
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def send_gemini_request(args: argparse.Namespace, final_prompt: str, image_paths: list[Path], resolved_api_url: str) -> dict:
+    payload = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": build_gemini_parts(final_prompt, image_paths),
+            }
+        ],
+        "generationConfig": {
+            "responseModalities": ["TEXT", "IMAGE"],
+        },
+    }
+    response = requests.post(
+        resolved_api_url,
+        headers={
+            "x-goog-api-key": args.api_key,
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=args.timeout,
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 def main() -> int:
@@ -285,6 +390,8 @@ def main() -> int:
     final_prompt = build_final_prompt(args, style)
 
     if args.dry_run:
+        print(f"API Format: {args.api_format}")
+        print(f"API URL: {resolve_api_url(args.api_format, args.api_url, args.model)}")
         print(final_prompt)
         return 0
 
@@ -296,29 +403,13 @@ def main() -> int:
         style = series_record["style"]
 
     if (not args.api_key) or args.api_key == DEFAULT_API_KEY:
-        print("Missing API key. Set YUNWU_API_KEY or pass --api-key.", file=sys.stderr)
+        print("Missing API key. Set IMAGE_GEN_API_KEY or pass --api-key.", file=sys.stderr)
         return 2
-
-    payload = {
-        "model": args.model,
-        "messages": [
-            {
-                "role": "user",
-                "content": build_request_content(final_prompt, image_paths),
-            }
-        ],
-    }
-    response = requests.post(
-        args.api_url,
-        headers={
-            "Authorization": f"Bearer {args.api_key}",
-            "Content-Type": "application/json",
-        },
-        json=payload,
-        timeout=args.timeout,
-    )
-    response.raise_for_status()
-    result = response.json()
+    resolved_api_url = resolve_api_url(args.api_format, args.api_url, args.model)
+    if args.api_format == "gemini":
+        result = send_gemini_request(args, final_prompt, image_paths, resolved_api_url)
+    else:
+        result = send_openai_request(args, final_prompt, image_paths, resolved_api_url)
 
     data_urls = extract_data_urls(result)
     if not data_urls:
@@ -352,8 +443,9 @@ def main() -> int:
         "outputs": [str(path) for path in saved_paths],
         "output_subdir": target_dir.name if target_dir != root else None,
         "model": args.model,
-        "api_url": args.api_url,
-        "response_id": result.get("id"),
+        "api_format": args.api_format,
+        "api_url": resolved_api_url,
+        "response_id": result.get("id") or result.get("responseId"),
     }
 
     sidecar_root = sidecars_dir(target_dir)

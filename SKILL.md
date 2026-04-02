@@ -1,6 +1,6 @@
 ---
 name: generate-image
-description: "Generate or edit high-fidelity raster images by calling a Yunwu-compatible image model, with explicit task-type and aspect-ratio inputs. Use when Codex needs to: (1) create ordinary product or visual assets, (2) draw project architecture or system diagrams, or (3) generate multiple PPT slide images in one visual language. Supports prompt-driven generation plus editing/compositing from up to 3 input images, and parallel PPT batch generation into a dedicated output subfolder."
+description: "Generate or edit high-fidelity raster images by calling either an OpenAI-compatible image endpoint or the official Gemini generateContent API, with explicit task-type and aspect-ratio inputs. Use when Codex needs to: (1) create ordinary product or visual assets, (2) draw project architecture or system diagrams, or (3) generate multiple PPT slide images in one visual language. Supports prompt-driven generation plus editing/compositing from up to 3 input images, and parallel PPT batch generation into a dedicated output subfolder."
 ---
 
 # Generate Image
@@ -55,10 +55,12 @@ Use the bundled scripts instead of writing one-off API clients.
 - For PPT series, save generated slide images into a child folder such as `codex_image_gen/investor_deck/`.
 
 ## Authentication and Runtime
-- Default API endpoint: `https://yunwu.ai/v1/chat/completions`
+- `--api-format openai`: use any OpenAI-compatible chat completions endpoint. If `--api-url` is omitted, the default example endpoint is `https://yunwu.ai/v1/chat/completions`.
+- `--api-format gemini`: use the official Gemini `generateContent` API. If `--api-url` is omitted, the script builds the official Google endpoint from `--model`.
 - Default model: `gemini-3.1-flash-image-preview`
-- Replace the placeholder `YOUR_YUNWU_API_KEY` in `scripts/_common.py`, or set `YUNWU_API_KEY`, or pass `--api-key ...` explicitly.
-- `OPENAI_API_KEY` is also accepted as a fallback env var for compatibility.
+- Replace the placeholder `YOUR_IMAGE_API_KEY` in `scripts/_common.py`, or set `IMAGE_GEN_API_KEY`, or pass `--api-key ...` explicitly.
+- `IMAGE_GEN_API_URL` and `IMAGE_GEN_MODEL` are the preferred generic env vars for endpoint and model overrides.
+- `GEMINI_API_KEY`, `GOOGLE_API_KEY`, `YUNWU_API_KEY`, and `OPENAI_API_KEY` are also accepted as fallback env vars for compatibility.
 
 ## Design Rules
 - Aim for immediate visual impact. Favor bold but controlled color systems, premium contrast, and clear hierarchy.
@@ -88,6 +90,7 @@ Use the bundled scripts instead of writing one-off API clients.
 ## Commands
 ```powershell
 python <skill_dir>\scripts\generate_image.py `
+  --api-format openai `
   --task-type normal `
   --aspect-ratio 16:9 `
   --output-format png `
@@ -97,6 +100,7 @@ python <skill_dir>\scripts\generate_image.py `
 
 ```powershell
 python <skill_dir>\scripts\generate_image.py `
+  --api-format openai `
   --task-type architecture `
   --aspect-ratio 16:9 `
   --output-format png `
@@ -107,6 +111,8 @@ python <skill_dir>\scripts\generate_image.py `
 
 ```powershell
 python <skill_dir>\scripts\generate_image.py `
+  --api-format gemini `
+  --model gemini-2.5-flash-image-preview `
   --task-type ppt `
   --aspect-ratio 16:9 `
   --output-format png `

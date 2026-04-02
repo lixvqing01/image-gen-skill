@@ -6,9 +6,11 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 
-DEFAULT_API_URL = "https://yunwu.ai/v1/chat/completions"
+DEFAULT_OPENAI_API_URL = "https://yunwu.ai/v1/chat/completions"
+DEFAULT_GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta"
+DEFAULT_API_FORMAT = "openai"
 DEFAULT_MODEL = "gemini-3.1-flash-image-preview"
-DEFAULT_API_KEY = "YOUR_YUNWU_API_KEY"
+DEFAULT_API_KEY = "YOUR_IMAGE_API_KEY"
 OUTPUT_DIR_NAME = "codex_image_gen"
 TASK_TYPE_ALIAS = {
     "ui": "normal",

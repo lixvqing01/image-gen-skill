@@ -7,13 +7,14 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from _common import load_or_create_series, now_iso, output_root, save_series, task_output_dir
+from _common import DEFAULT_MODEL, load_or_create_series, now_iso, output_root, save_series, task_output_dir
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate a whole slide series from one JSON manifest.")
     parser.add_argument("--slides-file", required=True, help="Path to a JSON manifest describing the slide series.")
     parser.add_argument("--output-root", help="Optional override for codex_image_gen root.")
+    parser.add_argument("--api-key", help="Optional API key override passed through to generate_image.py.")
     parser.add_argument("--max-workers", type=int, default=4, help="Parallel worker count for PPT slide generation.")
     parser.add_argument("--dry-run", action="store_true", help="Print planned commands without calling the image API.")
     return parser.parse_args()
@@ -22,6 +23,10 @@ def parse_args() -> argparse.Namespace:
 def build_command(
     script_path: Path,
     series_key: str,
+    api_format: str,
+    api_url: str,
+    model: str,
+    api_key: str | None,
     style_brief: str,
     aspect_ratio: str,
     output_format: str,
@@ -36,12 +41,16 @@ def build_command(
         str(script_path),
         "--task-type",
         "ppt",
+        "--api-format",
+        slide.get("api_format", api_format),
         "--series-key",
         series_key,
         "--aspect-ratio",
         slide.get("aspect_ratio", aspect_ratio),
         "--output-format",
         slide.get("output_format", output_format),
+        "--model",
+        slide.get("model", model),
         "--prompt",
         slide["prompt"],
         "--image-name",
@@ -56,6 +65,12 @@ def build_command(
         command.extend(["--style-brief", slide.get("style_brief", style_brief)])
     elif slide.get("style_brief"):
         command.extend(["--style-brief", slide["style_brief"]])
+    resolved_api_url = slide.get("api_url", api_url)
+    if resolved_api_url:
+        command.extend(["--api-url", resolved_api_url])
+    resolved_api_key = slide.get("api_key", api_key)
+    if resolved_api_key:
+        command.extend(["--api-key", resolved_api_key])
     if output_root:
         command.extend(["--output-root", output_root])
     if dry_run:
@@ -78,6 +93,9 @@ def main() -> int:
     payload = json.loads(slides_path.read_text(encoding="utf-8"))
 
     series_key = payload["series_key"]
+    api_format = payload.get("api_format", "openai")
+    api_url = payload.get("api_url", "")
+    model = payload.get("model", DEFAULT_MODEL)
     style_brief = payload.get("style_brief", "")
     aspect_ratio = payload.get("aspect_ratio", "16:9")
     output_format = payload.get("output_format", "png")
@@ -92,6 +110,10 @@ def main() -> int:
         build_command(
             script_path=script_path,
             series_key=series_key,
+            api_format=api_format,
+            api_url=api_url,
+            model=model,
+            api_key=args.api_key,
             style_brief=style_brief,
             aspect_ratio=aspect_ratio,
             output_format=output_format,

@@ -8,6 +8,8 @@ It supports:
 - `ppt` slide-image generation
 - parallel PPT batch generation from a JSON manifest
 - output format selection: `png` by default, `jpg` supported
+- `openai`-compatible endpoints
+- official Google Gemini `generateContent` API
 
 ## Structure
 - `SKILL.md`: skill instructions and trigger behavior
@@ -16,14 +18,28 @@ It supports:
 - `references/`: prompting and slide-series notes
 
 ## Authentication
-Set one of these before live use:
+Supported environment variables:
+- `IMAGE_GEN_API_KEY`
+- `IMAGE_GEN_API_URL`
+- `IMAGE_GEN_MODEL`
+- `GEMINI_API_KEY`
+- `GOOGLE_API_KEY`
 - `YUNWU_API_KEY`
 - `OPENAI_API_KEY`
 
-Or replace the placeholder `YOUR_YUNWU_API_KEY` in [`scripts/_common.py`](./scripts/_common.py).
+Or replace the placeholder `YOUR_IMAGE_API_KEY` in [`scripts/_common.py`](./scripts/_common.py).
 
-API endpoint:
-- `https://yunwu.ai/v1/chat/completions`
+## API Formats
+The script supports two protocol modes:
+
+- `openai`
+  Use any OpenAI-compatible chat completions endpoint.
+  Example default: `https://yunwu.ai/v1/chat/completions`
+
+- `gemini`
+  Use the official Google Gemini `generateContent` API.
+  If `--api-url` is omitted, the script builds:
+  `https://generativelanguage.googleapis.com/v1beta/models/<model>:generateContent`
 
 Default model:
 - `gemini-3.1-flash-image-preview`
@@ -31,6 +47,19 @@ Default model:
 ## Single Image
 ```powershell
 python .\scripts\generate_image.py `
+  --api-format openai `
+  --task-type normal `
+  --aspect-ratio 16:9 `
+  --output-format png `
+  --prompt "Create a premium product hero visual with dark glass panels and teal accent lighting." `
+  --image-name hero_visual
+```
+
+## Official Gemini Example
+```powershell
+python .\scripts\generate_image.py `
+  --api-format gemini `
+  --model gemini-2.5-flash-image-preview `
   --task-type normal `
   --aspect-ratio 16:9 `
   --output-format png `
@@ -41,6 +70,7 @@ python .\scripts\generate_image.py `
 ## Architecture Diagram
 ```powershell
 python .\scripts\generate_image.py `
+  --api-format openai `
   --task-type architecture `
   --aspect-ratio 16:9 `
   --output-format png `
@@ -51,6 +81,7 @@ python .\scripts\generate_image.py `
 ## PPT Slide
 ```powershell
 python .\scripts\generate_image.py `
+  --api-format openai `
   --task-type ppt `
   --aspect-ratio 16:9 `
   --output-format png `
@@ -65,6 +96,8 @@ Example manifest:
 ```json
 {
   "series_key": "investor_deck",
+  "api_format": "gemini",
+  "model": "gemini-2.5-flash-image-preview",
   "aspect_ratio": "16:9",
   "output_format": "png",
   "style_brief": "dark editorial deck with teal accent",
